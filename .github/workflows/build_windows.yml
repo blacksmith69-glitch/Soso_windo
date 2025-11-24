@@ -1,0 +1,34 @@
+name: Build Windows PYD
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Setup Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install build deps
+      run: |
+        pip install --upgrade pip
+        pip install cython setuptools wheel
+
+    - name: Build PYD
+      run: |
+        python -c "import sys, pathlib; print('cwd=', pathlib.Path.cwd())"
+        python setup.py build_ext --inplace
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-pyd
+        path: "*.pyd"
